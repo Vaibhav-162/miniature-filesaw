@@ -10,6 +10,7 @@ import { fileConversions } from "./constants/fileConversions";
 import { TABS } from "./constants/tabs";
 import { TabsKey } from "./types/tabs";
 import { STRINGS, ANIMATION, LAYOUT } from "./constants/app";
+import { Sun, Moon } from "lucide-react";
 
 function App() {
   const [files, setFiles] = useState<File[]>([]);

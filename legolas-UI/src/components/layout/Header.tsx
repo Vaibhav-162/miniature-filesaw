@@ -4,8 +4,7 @@ import { HeaderProps } from "../../types/layout";
 const Header = ({ isDarkMode, onThemeToggle }: HeaderProps) => {
   return (
     <div className="max-w mx-auto px-3 py-2 flex items-center justify-between">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white"
-      style={{ fontFamily: 'var(--font-mono)' }}>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-mono">
         TinyFile
       </h1>
       <button

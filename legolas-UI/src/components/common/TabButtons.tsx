@@ -1,5 +1,5 @@
-import { TabValue } from "@/types/tabs";
-import { TABS } from "../../constants/tabs";
+import { TabValue } from "../../types/tabs";
+import { TABS } from "../../constants/app";
 import { TabButtonProps, TabButtonsProps } from "../../types/components";
 
 const TabButton = ({ isActive, onClick, text }: TabButtonProps) => {
