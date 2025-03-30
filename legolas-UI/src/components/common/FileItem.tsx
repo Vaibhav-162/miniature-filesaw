@@ -30,4 +30,4 @@ const FileItem = ({ name, onRemove, fileFormat }: FileItemProps) => {
   );
 };
 
-export { FileItem };
+export default FileItem;

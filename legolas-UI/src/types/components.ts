@@ -27,11 +27,7 @@ export type WarningProps = {
 };
 
 export type DropzoneProps = {
-  isDragging: boolean;
-  onDragOver: (e: React.DragEvent) => void;
-  onDragLeave: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-  onFileInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFilesSelected: (files: File[]) => void;
   selectedFormat: string;
 };
 

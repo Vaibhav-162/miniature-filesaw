@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { ActionButton } from "./components/common/ActionButton";
 import { Dropdown } from "./components/common/Dropdown";
-import { Dropzone } from "./components/common/Dropzone";
-import { FileItem } from "./components/common/FileItem";
+import Dropzone from "./components/common/Dropzone";
+import FileItem from "./components/common/FileItem";
 import { TabButtons } from "./components/common/TabButtons";
 import { Warning } from "./components/common/Warning";
 import { Header } from "./components/layout/Header";
+import { ANIMATION, STRINGS } from "./constants/app";
 import { fileConversions } from "./constants/fileConversions";
 import { TABS } from "./constants/tabs";
 import { TabsKey } from "./types/tabs";
-import { STRINGS, ANIMATION, LAYOUT } from "./constants/app";
-import { Sun, Moon } from "lucide-react";
 
 function App() {
   const [files, setFiles] = useState<File[]>([]);
   const [targetFormat, setTargetFormat] = useState<string>("");
-  const [selectedFormat, setSelectedFormat] = useState<string>(STRINGS.FORMAT.ALL);
-  const [isDragging, setIsDragging] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<string>(
+    STRINGS.FORMAT.ALL
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isFormatDropdownOpen, setIsFormatDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[TabsKey]>(
@@ -62,16 +62,6 @@ function App() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
   const getAllowedFormats = () => {
     if (selectedFormat === STRINGS.FORMAT.ALL) {
       return fileConversions.map((c) => c.current);
@@ -79,42 +69,20 @@ function App() {
     return [selectedFormat];
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
+  const handleFilesSelected = (newFiles: File[]) => {
     if (selectedFormat === STRINGS.FORMAT.ALL) {
       setShowWarning(true);
       setTimeout(() => setShowWarning(false), 3000);
       return;
     }
 
-    const droppedFiles = Array.from(e.dataTransfer.files);
     const allowedFormats = getAllowedFormats();
-    const validFiles = droppedFiles.filter((file) => {
+    const validFiles = newFiles.filter((file) => {
       const extension = getFileExtension(file.name);
       return allowedFormats.includes(extension);
     });
 
     setFiles((prev) => [...prev, ...validFiles]);
-  };
-
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      if (selectedFormat === STRINGS.FORMAT.ALL) {
-        setShowWarning(true);
-        setTimeout(() => setShowWarning(false), 3000);
-        return;
-      }
-
-      const selectedFiles = Array.from(e.target.files);
-      const allowedFormats = getAllowedFormats();
-      const validFiles = selectedFiles.filter((file) => {
-        const extension = getFileExtension(file.name);
-        return allowedFormats.includes(extension);
-      });
-      setFiles((prev) => [...prev, ...validFiles]);
-    }
   };
 
   const removeFile = (index: number) => {
@@ -157,7 +125,7 @@ function App() {
   };
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''}`}>
+    <div className={`${isDarkMode ? "dark" : ""}`}>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <Header isDarkMode={isDarkMode} onThemeToggle={toggleTheme} />
         <div className="p-4">
@@ -172,9 +140,16 @@ function App() {
               <div className="mb-3 relative" ref={formatDropdownRef}>
                 <Dropdown
                   isOpen={isFormatDropdownOpen}
-                  onToggle={() => setIsFormatDropdownOpen(!isFormatDropdownOpen)}
-                  selectedValue={selectedFormat === STRINGS.FORMAT.ALL ? "" : selectedFormat}
-                  options={[STRINGS.DROPDOWN.SELECTED_FORMAT, ...fileConversions.map(f => f.current)]}
+                  onToggle={() =>
+                    setIsFormatDropdownOpen(!isFormatDropdownOpen)
+                  }
+                  selectedValue={
+                    selectedFormat === STRINGS.FORMAT.ALL ? "" : selectedFormat
+                  }
+                  options={[
+                    STRINGS.DROPDOWN.SELECTED_FORMAT,
+                    ...fileConversions.map((f) => f.current),
+                  ]}
                   onSelect={(value) => {
                     if (value === STRINGS.DROPDOWN.SELECTED_FORMAT) {
                       setSelectedFormat(STRINGS.FORMAT.ALL);
@@ -206,7 +181,11 @@ function App() {
                         isOpen={isDropdownOpen}
                         onToggle={() => setIsDropdownOpen(!isDropdownOpen)}
                         selectedValue={targetFormat}
-                        options={selectedFormat !== STRINGS.FORMAT.ALL ? getPossibleConversions(selectedFormat) : []}
+                        options={
+                          selectedFormat !== STRINGS.FORMAT.ALL
+                            ? getPossibleConversions(selectedFormat)
+                            : []
+                        }
                         onSelect={(value) => {
                           setTargetFormat(value);
                           setIsDropdownOpen(false);
@@ -224,30 +203,25 @@ function App() {
               )}
 
               <Dropzone
-                isDragging={isDragging}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onFileInput={handleFileInput}
+                onFilesSelected={handleFilesSelected}
                 selectedFormat={selectedFormat}
               />
 
               {files.length > 0 && (
-                <div
-                  className={`mt-2 space-y-1 file-list ${
-                    activeTab === TABS.CONVERT
-                      ? `max-h-[${LAYOUT.MAX_HEIGHT.CONVERT}]`
-                      : `max-h-[${LAYOUT.MAX_HEIGHT.COMPRESS}]`
-                  } rounded-lg`}
-                >
-                  {files.map((file, index) => (
-                    <FileItem
-                      key={index}
-                      name={file.name}
-                      onRemove={() => removeFile(index)}
-                      fileFormat={getFileExtension(file.name)}
-                    />
-                  ))}
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Selected Files:
+                  </h3>
+                  <div className={`${activeTab === TABS.COMPRESS ? "max-h-[30vh]" : "max-h-[25vh]"} file-list space-y-2`}>
+                    {files.map((file, index) => (
+                      <FileItem
+                        fileFormat={getFileExtension(file.name)}
+                        key={index}
+                        name={file.name}
+                        onRemove={() => removeFile(index)}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -255,10 +229,17 @@ function App() {
                 isDisabled={
                   files.length === 0 ||
                   (activeTab === TABS.CONVERT && !targetFormat) ||
-                  (activeTab === TABS.COMPRESS && selectedFormat === STRINGS.FORMAT.ALL)
+                  (activeTab === TABS.COMPRESS &&
+                    selectedFormat === STRINGS.FORMAT.ALL)
                 }
-                onClick={activeTab === TABS.CONVERT ? handleConvert : handleCompress}
-                text={activeTab === TABS.CONVERT ? STRINGS.BUTTON.CONVERT : STRINGS.BUTTON.COMPRESS}
+                onClick={
+                  activeTab === TABS.CONVERT ? handleConvert : handleCompress
+                }
+                text={
+                  activeTab === TABS.CONVERT
+                    ? STRINGS.BUTTON.CONVERT
+                    : STRINGS.BUTTON.COMPRESS
+                }
               />
             </div>
           </div>
